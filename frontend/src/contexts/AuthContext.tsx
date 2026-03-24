@@ -63,12 +63,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [workspaces, setWorkspaces] = useState<Workspace[]>([])
   const [loading, setLoading] = useState(true)
 
-  const authHeaders = token
-    ? {
-        Authorization: `Bearer ${token}`,
-      }
-    : {}
-
   const setWorkspace = (nextWorkspace: Workspace | null) => {
     setWorkspaceState(nextWorkspace)
     if (nextWorkspace) {
@@ -87,7 +81,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const data = (await apiRequest('/workspaces', {
       method: 'GET',
-      headers: authHeaders,
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     })) as Workspace[]
 
     setWorkspaces(data)

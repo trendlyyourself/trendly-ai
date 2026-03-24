@@ -18,12 +18,6 @@ export default function WorkspacesPage() {
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
 
-  const authHeaders = token
-    ? {
-        Authorization: `Bearer ${token}`,
-      }
-    : {}
-
   const loadWorkspaces = async () => {
     if (!token) return
     setLoading(true)
@@ -32,7 +26,9 @@ export default function WorkspacesPage() {
     try {
       const data = (await apiRequest('/workspaces', {
         method: 'GET',
-        headers: authHeaders,
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       })) as Workspace[]
 
       setWorkspaces(data)
@@ -62,7 +58,9 @@ export default function WorkspacesPage() {
     try {
       const created = (await apiRequest('/workspaces', {
         method: 'POST',
-        headers: authHeaders,
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify({ name }),
       })) as Workspace
 
