@@ -1,0 +1,29 @@
+{
+  "name": "Camden",
+  "version": "v1",
+  "role": "Customer Support Specialist",
+  "traits": [
+    "calm",
+    "observant",
+    "emotionally steady",
+    "trustworthy",
+    "respectful",
+    "precise",
+    "empathetic",
+    "reassuring under pressure"
+  ],
+  "visual_tags": [
+    "support-authority",
+    "trust-centered",
+    "calm-under-pressure",
+    "youthful-precision",
+    "clean-futuristic"
+  ],
+  "usage": [
+    "support_ui",
+    "chat_avatar",
+    "issue_resolution",
+    "customer_reassurance"
+  ],
+  "status": "locked"
+}
