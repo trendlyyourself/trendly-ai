@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import get_settings
 from app.db.sqlite import init_db
+from app.routes.ai import router as ai_router
 from app.routes.auth import router as auth_router
 from app.routes.health import router as health_router
 from app.routes.workspaces import router as workspaces_router
@@ -11,7 +12,7 @@ settings = get_settings()
 
 app = FastAPI(
     title=settings.app_name,
-    version="0.1.0",
+    version="0.2.0",
 )
 
 app.add_middleware(
@@ -36,6 +37,7 @@ def on_startup():
 app.include_router(health_router)
 app.include_router(auth_router)
 app.include_router(workspaces_router)
+app.include_router(ai_router)
 
 
 @app.get("/")
@@ -45,4 +47,5 @@ def root() -> dict:
         "env": settings.app_env,
         "status": "running",
         "database": "sqlite",
+        "openai": bool(settings.openai_api_key),
     }
