@@ -81,16 +81,22 @@ class ShopifyClient:
             "Content-Type": "application/json",
             "X-Shopify-Access-Token": self.config.access_token,
         }
-        async with httpx.AsyncClient(timeout=20.0) as client:
-            response = await client.post(
-                self.url,
-                headers=headers,
-                json={"query": query, "variables": variables},
-            )
-        response.raise_for_status()
-        payload = response.json()
+        try:
+            async with httpx.AsyncClient(timeout=20.0) as client:
+                response = await client.post(
+                    self.url,
+                    headers=headers,
+                    json={"query": query, "variables": variables},
+                )
+                response.raise_for_status()
+                payload = response.json()
+        except (httpx.HTTPError, ValueError) as exc:
+            raise ShopifyAPIError("Shopify API request failed") from exc
+
         if payload.get("errors"):
             raise ShopifyAPIError(str(payload["errors"]))
+        if not payload.get("data"):
+            raise ShopifyAPIError("Shopify API returned no data")
         return payload["data"]
 
     async def list_products(self, first: int = 50) -> dict[str, Any]:
