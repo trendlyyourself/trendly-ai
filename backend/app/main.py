@@ -5,6 +5,7 @@ from app.core.config import get_settings
 from app.db.sqlite import init_db
 from app.routes.auth import router as auth_router
 from app.routes.health import router as health_router
+from app.routes.shopify import router as shopify_router
 from app.routes.workspaces import router as workspaces_router
 
 settings = get_settings()
@@ -36,6 +37,7 @@ def on_startup():
 app.include_router(health_router)
 app.include_router(auth_router)
 app.include_router(workspaces_router)
+app.include_router(shopify_router)
 
 
 @app.get("/")
