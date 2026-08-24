@@ -1,9 +1,8 @@
 from fastapi import APIRouter, Depends, Header, HTTPException, status
 from pydantic import BaseModel, Field
 
-from app.deps.auth import get_current_user
 from app.core.config import get_settings
-from app.services.openai_service import OpenAIService
+from app.deps.auth import get_current_user
 
 router = APIRouter(prefix="/ai", tags=["ai"])
 
@@ -16,27 +15,24 @@ class GenerateResponse(BaseModel):
     text: str
 
 
+AI_PROVIDER_DISABLED = "No AI provider is configured. Configure a supported provider before using generation."
+
+
+def _provider_unavailable() -> HTTPException:
+    return HTTPException(
+        status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+        detail=AI_PROVIDER_DISABLED,
+    )
+
+
 @router.post("/generate", response_model=GenerateResponse)
-async def generate_text(payload: GenerateRequest, current_user=Depends(get_current_user)):
-    del current_user
+async def generate_text(
+    payload: GenerateRequest,
+    current_user=Depends(get_current_user),
+):
+    del current_user, payload
+    raise _provider_unavailable()
 
-    try:
-        service = OpenAIService()
-        text = await service.generate(payload.prompt)
-    except RuntimeError as exc:
-        raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail=str(exc),
-        ) from exc
-    except Exception as exc:
-        raise HTTPException(
-            status_code=status.HTTP_502_BAD_GATEWAY,
-            detail="OpenAI request failed",
-        ) from exc
-
-    return {"text": text}
-
-from fastapi import Header
 
 @router.post("/internal/generate", response_model=GenerateResponse)
 async def internal_generate(
@@ -57,18 +53,5 @@ async def internal_generate(
             detail="Invalid internal service key",
         )
 
-    try:
-        service = OpenAIService()
-        text = await service.generate(payload.prompt)
-    except RuntimeError as exc:
-        raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail=str(exc),
-        ) from exc
-    except Exception as exc:
-        raise HTTPException(
-            status_code=status.HTTP_502_BAD_GATEWAY,
-            detail="OpenAI request failed",
-        ) from exc
-
-    return {"text": text}
+    del payload
+    raise _provider_unavailable()
