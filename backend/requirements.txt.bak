@@ -1,9 +1,0 @@
-fastapi
-uvicorn[standard]
-python-jose
-passlib
-email-validator
-pydantic
-pydantic-settings
-python-multipart
-openai
