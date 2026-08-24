@@ -83,6 +83,81 @@ async def graphql(shop_domain: str, access_token: str, query: str, variables: di
     return payload["data"]
 
 
+def _clean_text(value: str) -> str:
+    return re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", value or "")).strip()
+
+
+def _truncate(value: str, limit: int) -> str:
+    value = _clean_text(value)
+    if len(value) <= limit:
+        return value
+    shortened = value[: limit + 1].rsplit(" ", 1)[0].rstrip(" ,;:-")
+    return shortened or value[:limit]
+
+
+def build_recommendations(product: dict) -> list[dict]:
+    seo = product.get("seo") or {}
+    current_title = (seo.get("title") or "").strip()
+    current_description = (seo.get("description") or "").strip()
+    product_title = _clean_text(product.get("title") or "")
+    source_description = _clean_text(product.get("description") or "")
+    recommendations = []
+
+    if not current_title:
+        proposed = _truncate(product_title, 60)
+        if proposed:
+            recommendations.append({
+                "type": "seo_title",
+                "priority": "high",
+                "reason": "The product has no SEO title.",
+                "current": "",
+                "proposed": proposed,
+                "requires_approval": True,
+            })
+    elif len(current_title) > 60:
+        recommendations.append({
+            "type": "seo_title",
+            "priority": "medium",
+            "reason": "The current SEO title exceeds 60 characters.",
+            "current": current_title,
+            "proposed": _truncate(current_title, 60),
+            "requires_approval": True,
+        })
+
+    if not current_description:
+        proposed = _truncate(source_description, 160)
+        if proposed:
+            recommendations.append({
+                "type": "seo_description",
+                "priority": "high",
+                "reason": "The product has no SEO description; the existing product description can supply one.",
+                "current": "",
+                "proposed": proposed,
+                "requires_approval": True,
+            })
+    elif len(current_description) > 160:
+        recommendations.append({
+            "type": "seo_description",
+            "priority": "medium",
+            "reason": "The current SEO description exceeds 160 characters.",
+            "current": current_description,
+            "proposed": _truncate(current_description, 160),
+            "requires_approval": True,
+        })
+
+    if product.get("missing_alt", 0) > 0:
+        recommendations.append({
+            "type": "image_alt_text",
+            "priority": "medium",
+            "reason": f"{product['missing_alt']} product image(s) have no alt text.",
+            "current": None,
+            "proposed": None,
+            "requires_approval": True,
+        })
+
+    return recommendations
+
+
 def audit_product(product: dict) -> dict:
     seo = product.get("seo") or {}
     images = [
@@ -107,7 +182,7 @@ def audit_product(product: dict) -> dict:
     if inventory <= 0:
         reasons.append("No positive inventory across variants")
     score = max(0, 100 - len(reasons) * 20)
-    return {
+    result = {
         "id": product["id"],
         "title": product["title"],
         "handle": product["handle"],
@@ -120,6 +195,8 @@ def audit_product(product: dict) -> dict:
         "score": score,
         "issues": reasons,
     }
+    result["recommendations"] = build_recommendations(result | {"description": product.get("description", "")})
+    return result
 
 
 async def scan_products(shop_domain: str, access_token: str) -> list[dict]:
