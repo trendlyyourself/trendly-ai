@@ -19,7 +19,7 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 
 def create_access_token(subject: str, workspace_id: str | None = None) -> str:
     settings = get_settings()
-    expire = datetime.now(timezone.utc) + timedelta(minutes=settings.jwt_expire_minutes)
+    expire = datetime.now(timezone.utc) + timedelta(minutes=settings.access_token_expire_minutes)
 
     payload: Dict[str, Any] = {
         "sub": subject,
@@ -29,12 +29,12 @@ def create_access_token(subject: str, workspace_id: str | None = None) -> str:
     if workspace_id:
         payload["workspace_id"] = workspace_id
 
-    return jwt.encode(payload, settings.jwt_secret_key, algorithm=settings.jwt_algorithm)
+    return jwt.encode(payload, settings.secret_key, algorithm="HS256")
 
 
 def decode_token(token: str) -> Dict[str, Any]:
     settings = get_settings()
     try:
-        return jwt.decode(token, settings.jwt_secret_key, algorithms=[settings.jwt_algorithm])
+        return jwt.decode(token, settings.secret_key, algorithms=["HS256"])
     except JWTError as exc:
         raise ValueError("Invalid token") from exc

@@ -13,6 +13,8 @@ class Settings(BaseSettings):
     sqlite_path: str = Field(default="./trendly_ai.db", alias="SQLITE_PATH")
     openai_api_key: str | None = Field(default=None, alias="OPENAI_API_KEY")
     openai_model: str = Field(default="gpt-5-mini", alias="OPENAI_MODEL")
+    internal_api_key: str | None = Field(default=None, alias="INTERNAL_API_KEY")
+    internal_service_key: str | None = Field(default=None, alias="INTERNAL_SERVICE_KEY")
 
     model_config = SettingsConfigDict(
         env_file=".env",
