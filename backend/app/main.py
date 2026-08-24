@@ -47,5 +47,5 @@ def root() -> dict:
         "env": settings.app_env,
         "status": "running",
         "database": "sqlite",
-        "openai": bool(settings.openai_api_key),
+        "ai_provider": "none",
     }
