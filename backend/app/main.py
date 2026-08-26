@@ -10,19 +10,11 @@ from app.routes.workspaces import router as workspaces_router
 
 settings = get_settings()
 
-app = FastAPI(
-    title=settings.app_name,
-    version="0.1.0",
-)
+app = FastAPI(title=settings.app_name, version="0.2.0")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://127.0.0.1:3000",
-        "http://localhost:3000",
-        "http://127.0.0.1:5173",
-        "http://localhost:5173",
-    ],
+    allow_origins=[settings.frontend_url, "http://127.0.0.1:5173", "http://localhost:5173"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -47,4 +39,5 @@ def root() -> dict:
         "env": settings.app_env,
         "status": "running",
         "database": "sqlite",
+        "version": "0.2.0",
     }

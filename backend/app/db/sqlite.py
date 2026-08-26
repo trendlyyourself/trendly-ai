@@ -15,8 +15,7 @@ def get_connection() -> sqlite3.Connection:
 
 def init_db() -> None:
     with get_connection() as conn:
-        conn.execute(
-            """
+        conn.execute("""
             CREATE TABLE IF NOT EXISTS users (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 full_name TEXT NOT NULL,
@@ -24,11 +23,8 @@ def init_db() -> None:
                 password_hash TEXT NOT NULL,
                 created_at TEXT DEFAULT CURRENT_TIMESTAMP
             )
-            """
-        )
-
-        conn.execute(
-            """
+        """)
+        conn.execute("""
             CREATE TABLE IF NOT EXISTS workspaces (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 user_id INTEGER NOT NULL,
@@ -37,8 +33,17 @@ def init_db() -> None:
                 created_at TEXT DEFAULT CURRENT_TIMESTAMP,
                 FOREIGN KEY(user_id) REFERENCES users(id)
             )
-            """
-        )
+        """)
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS shopify_connections (
+                workspace_id INTEGER PRIMARY KEY,
+                shop_domain TEXT NOT NULL,
+                access_token_encrypted TEXT NOT NULL,
+                created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+                updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY(workspace_id) REFERENCES workspaces(id) ON DELETE CASCADE
+            )
+        """)
         conn.commit()
 
 

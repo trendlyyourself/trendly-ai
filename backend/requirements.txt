@@ -7,3 +7,5 @@ email-validator
 pydantic
 pydantic-settings
 python-multipart
+httpx
+cryptography
