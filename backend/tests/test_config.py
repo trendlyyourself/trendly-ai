@@ -19,3 +19,9 @@ def test_production_is_blocked_until_managed_database_support_exists():
     secret = "a-unique-production-secret-value-with-more-than-32-bytes"
     with pytest.raises(ValidationError, match="managed database adapter"):
         Settings(_env_file=None, APP_ENV="production", SECRET_KEY=secret)
+
+
+def test_missing_app_env_fails_closed_as_production():
+    secret = "a-unique-production-secret-value-with-more-than-32-bytes"
+    with pytest.raises(ValidationError, match="managed database adapter"):
+        Settings(_env_file=None, SECRET_KEY=secret)
