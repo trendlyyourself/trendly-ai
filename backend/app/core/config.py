@@ -6,7 +6,8 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     app_name: str = Field(default="Trendly AI", alias="APP_NAME")
-    app_env: str = Field(default="development", alias="APP_ENV")
+    # Fail closed: deployments must explicitly opt into development mode.
+    app_env: str = Field(default="production", alias="APP_ENV")
     frontend_url: str = Field(default="http://127.0.0.1:5173", alias="FRONTEND_URL")
     secret_key: str = Field(default="change-me-secret-key", alias="SECRET_KEY")
     encryption_key: str | None = Field(default=None, alias="ENCRYPTION_KEY")
