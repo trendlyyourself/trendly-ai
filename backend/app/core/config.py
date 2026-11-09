@@ -19,6 +19,7 @@ class Settings(BaseSettings):
             secret = self.secret_key or ""
             if len(secret.encode("utf-8")) < 32 or secret.startswith("replace-with") or secret.startswith("change-me"):
                 raise ValueError("SECRET_KEY must be a unique, non-placeholder value of at least 32 bytes in production")
+            raise ValueError("This build uses SQLite only; production requires a managed database adapter and verified migration")
         return self
 
     model_config = SettingsConfigDict(

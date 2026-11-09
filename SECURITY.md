@@ -151,3 +151,16 @@ If a security vulnerability is discovered:
 - [FastAPI Security](https://fastapi.tiangolo.com/tutorial/security/)
 - [JWT Best Practices](https://tools.ietf.org/html/rfc8725)
 - [Password Storage Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html)
+
+
+## Production persistence release gate
+
+The current backend implementation uses SQLite (app/db/sqlite.py) and initializes that database at application startup. The repository's deployment guidance calls for PostgreSQL in production, but this codebase does not yet contain a PostgreSQL adapter or a verified data migration. A relative SQLite path is not a production persistence strategy.
+
+Until managed database support, data migration, and persistence/restart tests are implemented and reviewed:
+- APP_ENV=production is rejected by backend configuration.
+- Do not deploy this branch or promote SQLite to production.
+- Preserve the database as migration evidence; do not delete production data or perform a database reset.
+- Verify the actual hosting project, build root, and runtime working directory before deciding whether the committed SQLite file is used by a deployed service.
+
+Removing the database from this remediation branch does not erase copies in earlier Git commits or on the unchanged default branch. Git-history rewriting and production release remain separate approval gates.

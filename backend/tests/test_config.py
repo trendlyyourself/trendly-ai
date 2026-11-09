@@ -15,7 +15,7 @@ def test_production_rejects_weak_or_placeholder_secret(secret):
         Settings(_env_file=None, APP_ENV="production", SECRET_KEY=secret)
 
 
-def test_production_accepts_unique_secret_of_at_least_32_bytes():
+def test_production_is_blocked_until_managed_database_support_exists():
     secret = "a-unique-production-secret-value-with-more-than-32-bytes"
-    settings = Settings(_env_file=None, APP_ENV="production", SECRET_KEY=secret)
-    assert settings.secret_key == secret
+    with pytest.raises(ValidationError, match="managed database adapter"):
+        Settings(_env_file=None, APP_ENV="production", SECRET_KEY=secret)
