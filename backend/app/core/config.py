@@ -1,6 +1,6 @@
 from functools import lru_cache
 
-from pydantic import Field
+from pydantic import Field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -12,6 +12,14 @@ class Settings(BaseSettings):
     encryption_key: str | None = Field(default=None, alias="ENCRYPTION_KEY")
     access_token_expire_minutes: int = Field(default=60 * 24 * 7, alias="ACCESS_TOKEN_EXPIRE_MINUTES")
     sqlite_path: str = Field(default="./trendly_ai.db", alias="SQLITE_PATH")
+
+    @model_validator(mode="after")
+    def validate_production_secret(self):
+        if self.app_env.strip().lower() in {"production", "prod"}:
+            secret = self.secret_key or ""
+            if len(secret.encode("utf-8")) < 32 or secret.startswith("replace-with") or secret.startswith("change-me"):
+                raise ValueError("SECRET_KEY must be a unique, non-placeholder value of at least 32 bytes in production")
+        return self
 
     model_config = SettingsConfigDict(
         env_file=".env",
