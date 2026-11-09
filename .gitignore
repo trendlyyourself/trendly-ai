@@ -1,0 +1,26 @@
+# Local configuration and secrets
+.env
+.env.*
+!.env.example
+backend/.env
+backend/.env.*
+!backend/.env.example
+frontend/.env
+frontend/.env.*
+!frontend/.env.example
+
+# Local databases and runtime state
+*.db
+*.sqlite
+*.sqlite3
+*.db-journal
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# JavaScript
+node_modules/
+dist/
