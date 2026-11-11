@@ -1,4 +1,5 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
+import { Analytics } from '@vercel/analytics/react'
 import ProtectedRoute from './components/ProtectedRoute'
 import AppShell from './layouts/AppShell'
 import DashboardPage from './pages/DashboardPage'
@@ -9,15 +10,18 @@ import WorkspacesPage from './pages/WorkspacesPage'
 
 export default function App() {
   return (
-    <Routes>
-      <Route path="/" element={<Navigate to="/app/dashboard" replace />} />
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/signup" element={<SignupPage />} />
-      <Route path="/app" element={<ProtectedRoute><AppShell /></ProtectedRoute>}>
-        <Route path="dashboard" element={<DashboardPage />} />
-        <Route path="shopify" element={<ShopifyPage />} />
-        <Route path="workspaces" element={<WorkspacesPage />} />
-      </Route>
-    </Routes>
+    <>
+      <Routes>
+        <Route path="/" element={<Navigate to="/app/dashboard" replace />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<SignupPage />} />
+        <Route path="/app" element={<ProtectedRoute><AppShell /></ProtectedRoute>}>
+          <Route path="dashboard" element={<DashboardPage />} />
+          <Route path="shopify" element={<ShopifyPage />} />
+          <Route path="workspaces" element={<WorkspacesPage />} />
+        </Route>
+      </Routes>
+      <Analytics />
+    </>
   )
 }
